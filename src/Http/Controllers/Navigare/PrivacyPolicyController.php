@@ -5,7 +5,7 @@ namespace Laravel\Jetstream\Http\Controllers\Navigare;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
+use Navigare\Navigare;
 use Laravel\Jetstream\Jetstream;
 
 class PrivacyPolicyController extends Controller
@@ -20,7 +20,7 @@ class PrivacyPolicyController extends Controller
     {
         $policyFile = Jetstream::localizedMarkdownPath('policy.md');
 
-        return Inertia::render('PrivacyPolicy', [
+        return Navigare::render('PrivacyPolicy', [
             'policy' => Str::markdown(file_get_contents($policyFile)),
         ]);
     }

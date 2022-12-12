@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
+use Navigare\Navigare;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Contracts\DeletesUsers;
 
@@ -38,6 +38,6 @@ class CurrentUserController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Inertia::location(url('/'));
+        return Navigare::location(url('/'));
     }
 }
