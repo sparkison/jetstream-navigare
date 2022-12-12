@@ -78,6 +78,13 @@ class Jetstream
     public static $inertiaManager;
 
     /**
+     * The Inertia manager instance.
+     *
+     * @var \Laravel\Jetstream\NavigareManager
+     */
+    public static $navigareManager;
+
+    /**
      * Determine if Jetstream has registered roles.
      *
      * @return bool
@@ -456,6 +463,20 @@ class Jetstream
         }
 
         return static::$inertiaManager;
+    }
+
+    /**
+     * Manage Jetstream's Navigare settings.
+     *
+     * @return \Laravel\Jetstream\NavigareManager
+     */
+    public static function navigare()
+    {
+        if (is_null(static::$navigareManager)) {
+            static::$navigareManager = new NavigareManager;
+        }
+
+        return static::$navigareManager;
     }
 
     /**

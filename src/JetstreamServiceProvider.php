@@ -3,6 +3,7 @@
 namespace Laravel\Jetstream;
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\HandleNavigareRequests;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,9 @@ use Laravel\Jetstream\Http\Livewire\UpdatePasswordForm;
 use Laravel\Jetstream\Http\Livewire\UpdateProfileInformationForm;
 use Laravel\Jetstream\Http\Livewire\UpdateTeamNameForm;
 use Laravel\Jetstream\Http\Middleware\ShareInertiaData;
+use Laravel\Jetstream\Http\Middleware\ShareNavigareData;
 use Livewire\Livewire;
+use Navigare\Navigare;
 
 class JetstreamServiceProvider extends ServiceProvider
 {
@@ -92,6 +95,10 @@ class JetstreamServiceProvider extends ServiceProvider
 
         if (config('jetstream.stack') === 'inertia') {
             $this->bootInertia();
+        }
+
+        if (config('jetstream.stack') === 'navigare') {
+            $this->bootNavigare();
         }
     }
 
@@ -274,6 +281,61 @@ class JetstreamServiceProvider extends ServiceProvider
 
         Fortify::confirmPasswordView(function () {
             return Inertia::render('Auth/ConfirmPassword');
+        });
+    }
+
+    /**
+     * Boot any Navigare related services.
+     *
+     * @return void
+     */
+    protected function bootNavigare()
+    {
+        $kernel = $this->app->make(Kernel::class);
+
+        $kernel->appendMiddlewareToGroup('web', ShareNavigareData::class);
+        $kernel->appendToMiddlewarePriority(ShareNavigareData::class);
+
+        if (class_exists(HandleNavigareRequests::class)) {
+            $kernel->appendToMiddlewarePriority(HandleNavigareRequests::class);
+        }
+
+        Fortify::loginView(function () {
+            return Navigare::render('Auth/Login', [
+                'canResetPassword' => Route::has('password.request'),
+                'status' => session('status'),
+            ]);
+        });
+
+        Fortify::requestPasswordResetLinkView(function () {
+            return Navigare::render('Auth/ForgotPassword', [
+                'status' => session('status'),
+            ]);
+        });
+
+        Fortify::resetPasswordView(function (Request $request) {
+            return Navigare::render('Auth/ResetPassword', [
+                'email' => $request->input('email'),
+                'token' => $request->route('token'),
+            ]);
+        });
+
+        Fortify::registerView(function () {
+            return Navigare::render('Auth/Register');
+        });
+
+        Fortify::verifyEmailView(function () {
+            return Navigare::render('Auth/VerifyEmail', [
+                'status' => session('status'),
+            ]);
+        });
+
+        Fortify::twoFactorChallengeView(function () {
+            return Navigare::render('Auth/TwoFactorChallenge');
+        });
+
+        Fortify::confirmPasswordView(function () {
+            return Navigare::render('Auth/ConfirmPassword');
         });
     }
 }
